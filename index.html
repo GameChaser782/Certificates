@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Certificates | Harshit Upadhyay</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero__content">
+        <p class="hero__eyebrow">Portfolio</p>
+        <h1>Certificates</h1>
+        <p class="hero__lead">
+          A clean, recruiter-friendly view of my certifications and course
+          completions, organized for quick scanning and easy verification.
+        </p>
+        <div class="hero__meta">
+          <div>
+            <span class="label">Total</span>
+            <span id="total-count" class="value">0</span>
+          </div>
+          <div>
+            <span class="label">Collections</span>
+            <span id="group-count" class="value">0</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero__badge">
+        <span>Updated</span>
+        <strong>Feb 2, 2026</strong>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="about">
+        <div class="about__text">
+          <h2>About</h2>
+          <p>
+            I am Harshit Upadhyay, an AI Engineer based in Rajkot, India. I
+            graduated from IIT Bombay in 2024 and enjoy building practical
+            machine learning systems and data-driven products.
+          </p>
+          <p>
+            Outside work, you will usually find me learning new tech, listening
+            to lofi music, or playing chess and Valorant.
+          </p>
+        </div>
+        <div class="about__highlights">
+          <div>
+            <span class="label">Focus</span>
+            <p>AI, ML, Cloud, Data</p>
+          </div>
+          <div>
+            <span class="label">Interests</span>
+            <p>Cricket, startups, finance</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="controls">
+        <div class="filter">
+          <span class="label">Filter</span>
+          <div id="filter-buttons" class="filter__buttons"></div>
+        </div>
+        <label class="search">
+          <span class="label">Search</span>
+          <input
+            id="search-input"
+            type="search"
+            placeholder="Type a course, provider, or keyword"
+            autocomplete="off"
+          />
+        </label>
+      </section>
+
+      <section>
+        <div id="cards" class="grid"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        Want a quick verification? Every card opens the original PDF certificate
+        stored in this repository.
+      </p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
