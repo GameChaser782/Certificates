@@ -120,6 +120,26 @@ h3 {
   padding: 2.5rem clamp(1.5rem, 4vw, 5rem) 4rem;
 }
 
+.section {
+  margin-bottom: 3rem;
+}
+
+.section__header {
+  margin-bottom: 1.5rem;
+  max-width: 48rem;
+}
+
+.section__header h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.section__header p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
 .about {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
@@ -158,14 +178,6 @@ h3 {
   font-weight: 600;
 }
 
-.controls {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 280px);
-  gap: 1.5rem;
-  align-items: end;
-  margin-bottom: 2rem;
-}
-
 .label {
   font-size: 0.75rem;
   text-transform: uppercase;
@@ -173,41 +185,59 @@ h3 {
   color: var(--muted);
 }
 
-.filter__buttons {
+.stack {
+  display: grid;
+  gap: 2rem;
+}
+
+.block {
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--stroke);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 1.5rem;
+}
+
+.block__header {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 0.75rem;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
 }
 
-.filter__buttons button {
-  border: 1px solid var(--stroke);
-  background: var(--card);
-  color: var(--ink);
-  border-radius: 999px;
-  padding: 0.55rem 1.1rem;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+.block__title {
+  margin: 0;
+  font-size: 1.4rem;
 }
 
-.filter__buttons button.active,
-.filter__buttons button:hover {
-  background: var(--sea);
-  color: #fff7e6;
-  border-color: transparent;
-  box-shadow: 0 12px 30px rgba(29, 75, 82, 0.2);
-  transform: translateY(-2px);
+.feature-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  border-radius: 1.2rem;
+  background: linear-gradient(135deg, #13353a 0%, #1d4b52 45%, #2f6a72 100%);
+  color: #fef6e5;
+  box-shadow: 0 26px 60px rgba(15, 31, 35, 0.24);
 }
 
-.search input {
-  width: 100%;
-  margin-top: 0.75rem;
-  padding: 0.75rem 1rem;
-  border-radius: 0.9rem;
-  border: 1px solid var(--stroke);
-  font-size: 0.95rem;
-  background: var(--card);
+.feature-card__title {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.4rem;
+  margin: 0 0 0.5rem;
+}
+
+.feature-card__meta {
+  margin: 0;
+  color: rgba(255, 246, 229, 0.8);
+}
+
+.feature-card .action-button {
+  background: #fef6e5;
+  color: #1d4b52;
 }
 
 .grid {
@@ -250,14 +280,90 @@ h3 {
   font-size: 0.95rem;
 }
 
-.card a {
+.action-button {
+  border: none;
+  background: none;
+  padding: 0;
   color: var(--sea);
   font-weight: 600;
+  font-size: 0.95rem;
+  text-align: left;
+  cursor: pointer;
   text-decoration: none;
 }
 
-.card a:hover {
+.action-button:hover {
   text-decoration: underline;
+}
+
+.pdf-viewer {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 31, 35, 0.55);
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 1000;
+}
+
+.pdf-viewer.is-open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.pdf-viewer__window {
+  width: min(820px, 92vw);
+  height: min(70vh, 640px);
+  background: var(--card);
+  border-radius: 1.2rem;
+  border: 1px solid var(--stroke);
+  box-shadow: 0 40px 90px rgba(15, 31, 35, 0.35);
+  display: grid;
+  grid-template-rows: auto 1fr;
+  overflow: hidden;
+}
+
+.pdf-viewer__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: var(--sand);
+  border-bottom: 1px solid var(--stroke);
+  gap: 1rem;
+}
+
+.pdf-viewer__label {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin: 0 0 0.35rem;
+}
+
+.pdf-viewer__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.pdf-viewer__close {
+  border: 1px solid var(--stroke);
+  background: var(--card);
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pdf-viewer__frame {
+  width: 100%;
+  height: 100%;
+  border: none;
 }
 
 .footer {
@@ -279,7 +385,17 @@ h3 {
     grid-template-columns: 1fr;
   }
 
-  .controls {
-    grid-template-columns: 1fr;
+  .block__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .feature-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pdf-viewer__window {
+    height: min(75vh, 560px);
   }
 }

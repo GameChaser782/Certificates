@@ -27,7 +27,7 @@
             <span id="total-count" class="value">0</span>
           </div>
           <div>
-            <span class="label">Collections</span>
+            <span class="label">Sections</span>
             <span id="group-count" class="value">0</span>
           </div>
         </div>
@@ -64,31 +64,65 @@
         </div>
       </section>
 
-      <section class="controls">
-        <div class="filter">
-          <span class="label">Filter</span>
-          <div id="filter-buttons" class="filter__buttons"></div>
+      <section class="section" id="important">
+        <div class="section__header">
+          <h2>Important</h2>
+          <p>The credential that matters most right now.</p>
         </div>
-        <label class="search">
-          <span class="label">Search</span>
-          <input
-            id="search-input"
-            type="search"
-            placeholder="Type a course, provider, or keyword"
-            autocomplete="off"
-          />
-        </label>
+        <div id="important-card"></div>
       </section>
 
-      <section>
-        <div id="cards" class="grid"></div>
+      <section class="section" id="specializations">
+        <div class="section__header">
+          <h2>Coursera Specializations</h2>
+          <p>
+            Each specialization is highlighted first, followed by its
+            individual courses.
+          </p>
+        </div>
+        <div id="specialization-blocks" class="stack"></div>
+      </section>
+
+      <section class="section" id="projects">
+        <div class="section__header">
+          <h2>Coursera Projects</h2>
+          <p>Short guided projects and focused skill sprints.</p>
+        </div>
+        <div id="projects-grid" class="grid"></div>
+      </section>
+
+      <section class="section" id="others">
+        <div class="section__header">
+          <h2>Others</h2>
+          <p>Additional certificates and early-stage learning.</p>
+        </div>
+        <div id="others-blocks" class="stack"></div>
       </section>
     </main>
+
+    <div id="pdf-viewer" class="pdf-viewer" aria-hidden="true">
+      <div class="pdf-viewer__window" role="dialog" aria-modal="true">
+        <div class="pdf-viewer__header">
+          <div>
+            <p class="pdf-viewer__label">Certificate Preview</p>
+            <p id="pdf-title" class="pdf-viewer__title"></p>
+          </div>
+          <button id="pdf-close" class="pdf-viewer__close" type="button">
+            Close
+          </button>
+        </div>
+        <iframe
+          id="pdf-frame"
+          class="pdf-viewer__frame"
+          title="Certificate preview"
+        ></iframe>
+      </div>
+    </div>
 
     <footer class="footer">
       <p>
         Want a quick verification? Every card opens the original PDF certificate
-        stored in this repository.
+        right here in the page.
       </p>
     </footer>
 
