@@ -64,21 +64,13 @@
         </div>
       </section>
 
-      <section class="section" id="important">
-        <div class="section__header">
-          <h2>Important</h2>
-          <p>The credential that matters most right now.</p>
-        </div>
+      <section class="section section--important" id="important">
         <div id="important-card"></div>
       </section>
 
       <section class="section" id="specializations">
         <div class="section__header">
           <h2>Coursera Specializations</h2>
-          <p>
-            Each specialization is highlighted first, followed by its
-            individual courses.
-          </p>
         </div>
         <div id="specialization-blocks" class="stack"></div>
       </section>
@@ -107,9 +99,14 @@
             <p class="pdf-viewer__label">Certificate Preview</p>
             <p id="pdf-title" class="pdf-viewer__title"></p>
           </div>
-          <button id="pdf-close" class="pdf-viewer__close" type="button">
-            Close
-          </button>
+          <div class="pdf-viewer__actions">
+            <a id="pdf-download" class="pdf-viewer__download" download>
+              Download
+            </a>
+            <button id="pdf-close" class="pdf-viewer__close" type="button">
+              Close
+            </button>
+          </div>
         </div>
         <iframe
           id="pdf-frame"
@@ -118,13 +115,6 @@
         ></iframe>
       </div>
     </div>
-
-    <footer class="footer">
-      <p>
-        Want a quick verification? Every card opens the original PDF certificate
-        right here in the page.
-      </p>
-    </footer>
 
     <script src="script.js"></script>
   </body>
