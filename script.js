@@ -197,7 +197,7 @@ const data = {
 
 const importantCard = document.getElementById("important-card");
 const specializationBlocks = document.getElementById("specialization-blocks");
-const projectsGrid = document.getElementById("projects-grid");
+const projectsBlocks = document.getElementById("projects-blocks");
 const othersBlocks = document.getElementById("others-blocks");
 const totalCount = document.getElementById("total-count");
 const groupCount = document.getElementById("group-count");
@@ -321,9 +321,10 @@ const createCard = (item) => {
   return card;
 };
 
-const createFeatureCard = (item) => {
+const createFeatureCard = (item, options = {}) => {
+  const { tone = "accent" } = options;
   const card = document.createElement("article");
-  card.className = "feature-card";
+  card.className = `feature-card${tone === "plain" ? " feature-card--plain" : ""}`;
 
   const text = document.createElement("div");
   const title = document.createElement("h3");
@@ -390,14 +391,14 @@ const renderSpecializations = () => {
 
     const header = createCollapsibleHeader({
       titleText: specialization.name,
-      labelText: "Specialization",
+      labelText: "Coursera Specialization",
     });
 
     const subtitle = document.createElement("p");
     subtitle.className = "block__subtitle";
     subtitle.textContent = "The specialization included these courses.";
 
-    const featured = createFeatureCard(specialization.focus);
+    const featured = createFeatureCard(specialization.focus, { tone: "plain" });
 
     const grid = document.createElement("div");
     grid.className = "grid";
@@ -438,10 +439,45 @@ const syncMobileCollapsibles = () => {
 };
 
 const renderProjects = () => {
-  projectsGrid.innerHTML = "";
-  data.projects.forEach((project) => {
-    projectsGrid.appendChild(createCard(project));
+  projectsBlocks.innerHTML = "";
+
+  const block = document.createElement("div");
+  block.className = "block";
+  block.dataset.collapsible = "true";
+  block.dataset.expandedDesktop = "true";
+  block.dataset.expandedMobile = "false";
+
+  const header = createCollapsibleHeader({
+    titleText: "Coursera Projects",
+    labelText: "Coursera Projects",
   });
+
+  const subtitle = document.createElement("p");
+  subtitle.className = "block__subtitle";
+  subtitle.textContent = "Short guided projects and focused skill sprints.";
+
+  const grid = document.createElement("div");
+  grid.className = "grid";
+  data.projects.forEach((project) => {
+    grid.appendChild(createCard(project));
+  });
+
+  const content = document.createElement("div");
+  content.className = "block__content";
+  content.append(subtitle, grid);
+
+  header.addEventListener("click", () => {
+    const nextExpanded = header.getAttribute("aria-expanded") !== "true";
+    if (mobileMediaQuery.matches) {
+      block.dataset.expandedMobile = String(nextExpanded);
+    } else {
+      block.dataset.expandedDesktop = String(nextExpanded);
+    }
+    applyCollapsibleState(block, nextExpanded);
+  });
+
+  block.append(header, content);
+  projectsBlocks.appendChild(block);
 };
 
 const renderOthers = () => {
@@ -481,53 +517,6 @@ const renderOthers = () => {
     block.append(header, content);
     othersBlocks.appendChild(block);
   });
-};
-
-const initSectionToggle = ({ sectionId, labelText, desktopExpanded = true, mobileExpanded = false }) => {
-  const section = document.getElementById(sectionId);
-  if (!section) {
-    return;
-  }
-
-  const existingHeader = section.querySelector(".section__header");
-  if (!existingHeader || section.querySelector("[data-toggle-header]")) {
-    return;
-  }
-
-  const title = existingHeader.querySelector("h2")?.textContent?.trim() || "";
-  const description = existingHeader.querySelector("p");
-  const contentNodes = Array.from(section.children).filter((node) => node !== existingHeader);
-
-  section.dataset.collapsible = "true";
-  section.dataset.expandedDesktop = String(desktopExpanded);
-  section.dataset.expandedMobile = String(mobileExpanded);
-
-  const header = createCollapsibleHeader({
-    titleText: title,
-    labelText,
-    titleTag: "span",
-    className: "section__header section__toggle",
-  });
-
-  const content = document.createElement("div");
-  content.className = "section__content";
-  if (description) {
-    content.append(description);
-  }
-  contentNodes.forEach((node) => content.append(node));
-
-  header.addEventListener("click", () => {
-    const nextExpanded = header.getAttribute("aria-expanded") !== "true";
-    if (mobileMediaQuery.matches) {
-      section.dataset.expandedMobile = String(nextExpanded);
-    } else {
-      section.dataset.expandedDesktop = String(nextExpanded);
-    }
-    applyCollapsibleState(section, nextExpanded);
-  });
-
-  existingHeader.replaceWith(header);
-  section.append(content);
 };
 
 const countTotalCertificates = () => {
@@ -573,18 +562,6 @@ renderImportant();
 renderSpecializations();
 renderProjects();
 renderOthers();
-initSectionToggle({
-  sectionId: "projects",
-  labelText: "Projects",
-  desktopExpanded: true,
-  mobileExpanded: false,
-});
-initSectionToggle({
-  sectionId: "others",
-  labelText: "Collection",
-  desktopExpanded: true,
-  mobileExpanded: false,
-});
 syncMobileCollapsibles();
 
 totalCount.textContent = countTotalCertificates().toString();
