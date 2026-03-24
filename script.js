@@ -206,11 +206,84 @@ const pdfFrame = document.getElementById("pdf-frame");
 const pdfTitle = document.getElementById("pdf-title");
 const pdfClose = document.getElementById("pdf-close");
 const pdfDownload = document.getElementById("pdf-download");
+const pdfWindow = document.querySelector(".pdf-viewer__window");
+const pdfHeader = document.querySelector(".pdf-viewer__header");
+
+const getPdfViewerSrc = (file) => {
+  const encodedFile = encodeURI(file);
+  return `${encodedFile}#view=Fit`;
+};
+
+const mobileMediaQuery = window.matchMedia("(max-width: 800px)");
+const isDesktopExpandedByDefault = () => !mobileMediaQuery.matches;
+const isMobileExpandedByDefault = () => false;
+
+const updateViewerDimensions = () => {
+  if (!mobileMediaQuery.matches) {
+    pdfWindow?.style.removeProperty("--viewer-width");
+    pdfWindow?.style.removeProperty("--viewer-height");
+    return;
+  }
+
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  const outerPadding = 24;
+  const headerHeight = pdfHeader?.offsetHeight ?? 96;
+  const maxWidth = viewportWidth - outerPadding;
+  const maxFrameHeight = viewportHeight - outerPadding - headerHeight;
+
+  const widthFromHeight = maxFrameHeight * 1.414;
+  const fittedWidth = Math.min(maxWidth, widthFromHeight);
+  const fittedHeight = fittedWidth / 1.414;
+
+  pdfWindow?.style.setProperty("--viewer-width", `${Math.max(fittedWidth, 0)}px`);
+  pdfWindow?.style.setProperty("--viewer-height", `${Math.max(fittedHeight, 0)}px`);
+};
+
+const applyCollapsibleState = (container, expanded) => {
+  const header = container.querySelector("[data-toggle-header]");
+  if (!header) {
+    return;
+  }
+  header.setAttribute("aria-expanded", String(expanded));
+  container.classList.toggle("is-collapsed", !expanded);
+};
+
+const createToggleIcon = () => {
+  const toggleIcon = document.createElement("span");
+  toggleIcon.className = "block__toggle-icon";
+  toggleIcon.setAttribute("aria-hidden", "true");
+  toggleIcon.textContent = "+";
+  return toggleIcon;
+};
+
+const createCollapsibleHeader = ({ titleText, labelText, titleTag = "span", className = "block__header block__toggle" }) => {
+  const header = document.createElement("button");
+  header.className = className;
+  header.type = "button";
+  header.dataset.toggleHeader = "true";
+
+  const title = document.createElement(titleTag);
+  title.className = "block__title";
+  title.textContent = titleText;
+
+  const label = document.createElement("span");
+  label.className = "label";
+  label.textContent = labelText;
+
+  const headerText = document.createElement("span");
+  headerText.className = "block__header-text";
+  headerText.append(title, label);
+
+  header.append(headerText, createToggleIcon());
+  return header;
+};
 
 const openPdf = (item) => {
   pdfTitle.textContent = item.title;
-  pdfFrame.src = encodeURI(item.file);
+  pdfFrame.src = getPdfViewerSrc(item.file);
   pdfDownload.href = encodeURI(item.file);
+  updateViewerDimensions();
   pdfViewer.classList.add("is-open");
   pdfViewer.setAttribute("aria-hidden", "false");
   document.body.style.overflow = "hidden";
@@ -311,19 +384,14 @@ const renderSpecializations = () => {
   data.specializations.forEach((specialization) => {
     const block = document.createElement("div");
     block.className = "block";
+    block.dataset.collapsible = "true";
+    block.dataset.expandedDesktop = String(isDesktopExpandedByDefault());
+    block.dataset.expandedMobile = String(isMobileExpandedByDefault());
 
-    const header = document.createElement("div");
-    header.className = "block__header";
-
-    const title = document.createElement("h3");
-    title.className = "block__title";
-    title.textContent = specialization.name;
-
-    const label = document.createElement("span");
-    label.className = "label";
-    label.textContent = "Specialization";
-
-    header.append(title, label);
+    const header = createCollapsibleHeader({
+      titleText: specialization.name,
+      labelText: "Specialization",
+    });
 
     const subtitle = document.createElement("p");
     subtitle.className = "block__subtitle";
@@ -337,8 +405,35 @@ const renderSpecializations = () => {
       grid.appendChild(createCard(course));
     });
 
-    block.append(header, subtitle, featured, grid);
+    const content = document.createElement("div");
+    content.className = "block__content";
+    content.append(subtitle, featured, grid);
+
+    header.addEventListener("click", () => {
+      const nextExpanded = header.getAttribute("aria-expanded") !== "true";
+      if (mobileMediaQuery.matches) {
+        block.dataset.expandedMobile = String(nextExpanded);
+      } else {
+        block.dataset.expandedDesktop = String(nextExpanded);
+      }
+      applyCollapsibleState(block, nextExpanded);
+    });
+
+    block.append(header, content);
     specializationBlocks.appendChild(block);
+  });
+};
+
+const syncMobileCollapsibles = () => {
+  document.querySelectorAll("[data-collapsible='true']").forEach((block) => {
+    const header = block.querySelector("[data-toggle-header]");
+    if (!header) {
+      return;
+    }
+    const isExpanded = mobileMediaQuery.matches
+      ? block.dataset.expandedMobile === "true"
+      : block.dataset.expandedDesktop !== "false";
+    applyCollapsibleState(block, isExpanded);
   });
 };
 
@@ -354,19 +449,14 @@ const renderOthers = () => {
   data.others.forEach((collection) => {
     const block = document.createElement("div");
     block.className = "block";
+    block.dataset.collapsible = "true";
+    block.dataset.expandedDesktop = "true";
+    block.dataset.expandedMobile = "false";
 
-    const header = document.createElement("div");
-    header.className = "block__header";
-
-    const title = document.createElement("h3");
-    title.className = "block__title";
-    title.textContent = collection.name;
-
-    const label = document.createElement("span");
-    label.className = "label";
-    label.textContent = "Other certificates";
-
-    header.append(title, label);
+    const header = createCollapsibleHeader({
+      titleText: collection.name,
+      labelText: "Other certificates",
+    });
 
     const grid = document.createElement("div");
     grid.className = "grid";
@@ -374,9 +464,70 @@ const renderOthers = () => {
       grid.appendChild(createCard(item));
     });
 
-    block.append(header, grid);
+    const content = document.createElement("div");
+    content.className = "block__content";
+    content.append(grid);
+
+    header.addEventListener("click", () => {
+      const nextExpanded = header.getAttribute("aria-expanded") !== "true";
+      if (mobileMediaQuery.matches) {
+        block.dataset.expandedMobile = String(nextExpanded);
+      } else {
+        block.dataset.expandedDesktop = String(nextExpanded);
+      }
+      applyCollapsibleState(block, nextExpanded);
+    });
+
+    block.append(header, content);
     othersBlocks.appendChild(block);
   });
+};
+
+const initSectionToggle = ({ sectionId, labelText, desktopExpanded = true, mobileExpanded = false }) => {
+  const section = document.getElementById(sectionId);
+  if (!section) {
+    return;
+  }
+
+  const existingHeader = section.querySelector(".section__header");
+  if (!existingHeader || section.querySelector("[data-toggle-header]")) {
+    return;
+  }
+
+  const title = existingHeader.querySelector("h2")?.textContent?.trim() || "";
+  const description = existingHeader.querySelector("p");
+  const contentNodes = Array.from(section.children).filter((node) => node !== existingHeader);
+
+  section.dataset.collapsible = "true";
+  section.dataset.expandedDesktop = String(desktopExpanded);
+  section.dataset.expandedMobile = String(mobileExpanded);
+
+  const header = createCollapsibleHeader({
+    titleText: title,
+    labelText,
+    titleTag: "span",
+    className: "section__header section__toggle",
+  });
+
+  const content = document.createElement("div");
+  content.className = "section__content";
+  if (description) {
+    content.append(description);
+  }
+  contentNodes.forEach((node) => content.append(node));
+
+  header.addEventListener("click", () => {
+    const nextExpanded = header.getAttribute("aria-expanded") !== "true";
+    if (mobileMediaQuery.matches) {
+      section.dataset.expandedMobile = String(nextExpanded);
+    } else {
+      section.dataset.expandedDesktop = String(nextExpanded);
+    }
+    applyCollapsibleState(section, nextExpanded);
+  });
+
+  existingHeader.replaceWith(header);
+  section.append(content);
 };
 
 const countTotalCertificates = () => {
@@ -405,10 +556,36 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
+if (typeof mobileMediaQuery.addEventListener === "function") {
+  mobileMediaQuery.addEventListener("change", syncMobileCollapsibles);
+} else if (typeof mobileMediaQuery.addListener === "function") {
+  mobileMediaQuery.addListener(syncMobileCollapsibles);
+}
+
+window.addEventListener("resize", () => {
+  syncMobileCollapsibles();
+  if (pdfViewer.classList.contains("is-open")) {
+    updateViewerDimensions();
+  }
+});
+
 renderImportant();
 renderSpecializations();
 renderProjects();
 renderOthers();
+initSectionToggle({
+  sectionId: "projects",
+  labelText: "Projects",
+  desktopExpanded: true,
+  mobileExpanded: false,
+});
+initSectionToggle({
+  sectionId: "others",
+  labelText: "Collection",
+  desktopExpanded: true,
+  mobileExpanded: false,
+});
+syncMobileCollapsibles();
 
 totalCount.textContent = countTotalCertificates().toString();
 groupCount.textContent = "4";
