@@ -197,7 +197,9 @@ const data = {
 
 const importantCard = document.getElementById("important-card");
 const specializationBlocks = document.getElementById("specialization-blocks");
-const projectsBlocks = document.getElementById("projects-blocks");
+const projectsBlocks =
+  document.getElementById("projects-blocks") ||
+  document.getElementById("projects-grid");
 const othersBlocks = document.getElementById("others-blocks");
 const totalCount = document.getElementById("total-count");
 const groupCount = document.getElementById("group-count");
@@ -376,11 +378,17 @@ const createFeatureCard = (item, options = {}) => {
 };
 
 const renderImportant = () => {
+  if (!importantCard) {
+    return;
+  }
   importantCard.innerHTML = "";
   importantCard.appendChild(createFeatureCard(data.important));
 };
 
 const renderSpecializations = () => {
+  if (!specializationBlocks) {
+    return;
+  }
   specializationBlocks.innerHTML = "";
   data.specializations.forEach((specialization) => {
     const block = document.createElement("div");
@@ -439,6 +447,9 @@ const syncMobileCollapsibles = () => {
 };
 
 const renderProjects = () => {
+  if (!projectsBlocks) {
+    return;
+  }
   projectsBlocks.innerHTML = "";
 
   const block = document.createElement("div");
@@ -481,6 +492,9 @@ const renderProjects = () => {
 };
 
 const renderOthers = () => {
+  if (!othersBlocks) {
+    return;
+  }
   othersBlocks.innerHTML = "";
   data.others.forEach((collection) => {
     const block = document.createElement("div");
@@ -532,8 +546,8 @@ const countTotalCertificates = () => {
   return 1 + specializationCount + projectsCount + othersCount;
 };
 
-pdfClose.addEventListener("click", closePdf);
-pdfViewer.addEventListener("click", (event) => {
+pdfClose?.addEventListener("click", closePdf);
+pdfViewer?.addEventListener("click", (event) => {
   if (event.target === pdfViewer) {
     closePdf();
   }
@@ -564,7 +578,13 @@ renderProjects();
 renderOthers();
 syncMobileCollapsibles();
 
-totalCount.textContent = countTotalCertificates().toString();
-groupCount.textContent = "4";
+if (totalCount) {
+  totalCount.textContent = countTotalCertificates().toString();
+}
+if (groupCount) {
+  groupCount.textContent = "4";
+}
 
-openPdf(data.important);
+if (pdfViewer && pdfFrame && pdfTitle && pdfDownload) {
+  openPdf(data.important);
+}
